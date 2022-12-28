@@ -1,0 +1,21 @@
+每个新模块加入的流程
+
+1.逆向工程生成代码，改application的数据库url，generator的模块名和表前缀；
+2.覆盖main文件夹
+2.5.引入Common依赖
+3.application.yml配置
+4.启动类MapperScan扫描dao包
+5.测试
+
+//nacos部分
+6.application.yml配置nacosserver的server-addr和application.name
+7.启动类注解@EnableDiscoveryClient
+
+//feign部分
+8.在主动调用方编写feign包，feign接口，接口注解@FeignClient("mall-coupon")
+9.复制被调用方法的完整签名过来，注意路径要写全
+10.主动调用方的启动类注解@EnableFeignClients(basePackages="com.jcfx.mall.member.feign")
+
+//nacos配置中心部分
+11.创建bootstrap.properties，配应用名字和nacos地址
+12.nacos配置中配置 应用名字.properties 的配置文件
