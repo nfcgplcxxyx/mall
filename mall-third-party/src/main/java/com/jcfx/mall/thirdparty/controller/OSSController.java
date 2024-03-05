@@ -28,13 +28,11 @@ public class OSSController {
     @Value("${spring.cloud.alicloud.access-key}")
     private String accessId;
 
-
+    // 返回签名给前端，前端带着签名和文件上传阿里云，文件就不走服务端了
     @RequestMapping("/oss/policy")
     public R policy() {
 
         String host = "https://" + bucket + "." + endpoint;
-        // callbackUrl为 上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
-//        String callbackUrl = "http://88.88.88.88:8888";
         String format = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         String dir = format + "/";
 

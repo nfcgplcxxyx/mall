@@ -1,25 +1,15 @@
 package com.jcfx.mall.product.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.jcfx.common.validator.AddGroup;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.jcfx.mall.product.entity.BrandEntity;
-import com.jcfx.mall.product.service.BrandService;
 import com.jcfx.common.utils.PageUtils;
 import com.jcfx.common.utils.R;
+import com.jcfx.mall.product.entity.BrandEntity;
+import com.jcfx.mall.product.service.BrandService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.Map;
 
 
 /**
@@ -59,9 +49,25 @@ public class BrandController {
      */
     @RequestMapping("/save")
     //public R save(@Validated({AddGroup.class}) @RequestBody BrandEntity brand) {
+//    public R save(@Valid @RequestBody BrandEntity brand, BindingResult result) {
     public R save(@Valid @RequestBody BrandEntity brand) {
+//        if (result.hasErrors()) {
+//            // 获取校验结果的详细信息
+//            Map<String, String> map = new HashMap<>();
+//            result.getFieldErrors().forEach(fieldError -> {
+//                // 错误消息
+//                String message = fieldError.getDefaultMessage();
+//                // 错误的字段名
+//                String fieldName = fieldError.getField();
+//                map.put(fieldName, message);
+//            });
+//
+//            return R.error("提交的数据不合法").put("data", map);
+//        } else {
+//            brandService.save(brand);
+//            return R.ok();
+//        }
         brandService.save(brand);
-
         return R.ok();
     }
 

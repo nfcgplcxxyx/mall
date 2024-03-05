@@ -1,39 +1,37 @@
 package com.jcfx.mall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jcfx.common.constant.ProductConstant;
+import com.jcfx.common.utils.PageUtils;
+import com.jcfx.common.utils.Query;
 import com.jcfx.mall.product.dao.AttrAttrgroupRelationDao;
+import com.jcfx.mall.product.dao.AttrDao;
 import com.jcfx.mall.product.dao.AttrGroupDao;
 import com.jcfx.mall.product.dao.CategoryDao;
 import com.jcfx.mall.product.entity.AttrAttrgroupRelationEntity;
+import com.jcfx.mall.product.entity.AttrEntity;
 import com.jcfx.mall.product.entity.AttrGroupEntity;
 import com.jcfx.mall.product.entity.CategoryEntity;
+import com.jcfx.mall.product.service.AttrService;
 import com.jcfx.mall.product.service.CategoryService;
 import com.jcfx.mall.product.vo.AttrGroupRelationVo;
 import com.jcfx.mall.product.vo.AttrRespVo;
 import com.jcfx.mall.product.vo.AttrVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jcfx.common.utils.PageUtils;
-import com.jcfx.common.utils.Query;
-
-import com.jcfx.mall.product.dao.AttrDao;
-import com.jcfx.mall.product.entity.AttrEntity;
-import com.jcfx.mall.product.service.AttrService;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 
 @Service("attrService")
@@ -65,6 +63,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         BeanUtils.copyProperties(attr, entity);
         this.save(entity);
 
+        // 将属性和属性分组的关联关系保存
         if (attr.getAttrType() == ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode() && attr.getAttrGroupId() != null) {
             AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
             relationEntity.setAttrGroupId(attr.getAttrGroupId());
@@ -224,6 +223,13 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         PageUtils pageUtils = new PageUtils(page);
 
         return pageUtils;
+    }
+
+    @Override
+    public List<AttrEntity> getSearcheableAttrs(List<Long> attrIds) {
+        LambdaQueryWrapper<AttrEntity> wrapper = new QueryWrapper<AttrEntity>().lambda();
+        wrapper.in(AttrEntity::getAttrId, attrIds).eq(AttrEntity::getSearchType, 1);
+        return this.list(wrapper);
     }
 
 }

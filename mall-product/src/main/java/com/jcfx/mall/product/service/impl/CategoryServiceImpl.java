@@ -1,23 +1,22 @@
 package com.jcfx.mall.product.service.impl;
 
-import com.jcfx.mall.product.service.CategoryBrandRelationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jcfx.common.utils.PageUtils;
 import com.jcfx.common.utils.Query;
-
 import com.jcfx.mall.product.dao.CategoryDao;
 import com.jcfx.mall.product.entity.CategoryEntity;
+import com.jcfx.mall.product.service.CategoryBrandRelationService;
 import com.jcfx.mall.product.service.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service("categoryService")
@@ -25,12 +24,14 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<CategoryEntity> page = this.page(
                 new Query<CategoryEntity>().getPage(params),
-                new QueryWrapper<CategoryEntity>()
+                new QueryWrapper<>()
         );
 
         return new PageUtils(page);
@@ -55,6 +56,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public void removeCatByIds(List<Long> asList) {
+        // TODO 检查菜单是否在其他地方被引用
         baseMapper.deleteBatchIds(asList);
     }
 
@@ -71,6 +73,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     @Override
     public void updateCascade(CategoryEntity category) {
         this.updateById(category);
+        // 级联更新，分类-品牌关联表中存储了分类名
         if (!StringUtils.isEmpty(category.getName())) {
             categoryBrandRelationService.updateCategoryName(category.getCatId(), category.getName());
         }
@@ -81,7 +84,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * @param all     所有分类
      * @return 递归查找当前分类的子分类
      */
-
     private List<CategoryEntity> getChildren(CategoryEntity current, List<CategoryEntity> all) {
         List<CategoryEntity> children = all.stream().filter(category -> category.getParentCid() == current.getCatId())
                 .map(category -> {

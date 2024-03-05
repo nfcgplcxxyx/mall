@@ -1,17 +1,17 @@
 package com.jcfx.mall.order.dao;
 
-import com.jcfx.mall.order.entity.OrderReturnApplyEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jcfx.mall.order.entity.OrderReturnApplyEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
  * ?????˻????
- * 
+ *
  * @author Bob Shaw
  * @email hninee@163.com
  * @date 2022-12-21 10:06:19
  */
 @Mapper
 public interface OrderReturnApplyDao extends BaseMapper<OrderReturnApplyEntity> {
-	
+
 }

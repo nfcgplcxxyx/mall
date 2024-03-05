@@ -1,11 +1,11 @@
 package com.jcfx.mall.product.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import com.jcfx.common.utils.PageUtils;
+import com.jcfx.common.utils.R;
 import com.jcfx.mall.product.entity.AttrEntity;
+import com.jcfx.mall.product.entity.AttrGroupEntity;
 import com.jcfx.mall.product.service.AttrAttrgroupRelationService;
+import com.jcfx.mall.product.service.AttrGroupService;
 import com.jcfx.mall.product.service.AttrService;
 import com.jcfx.mall.product.service.CategoryService;
 import com.jcfx.mall.product.vo.AttrGroupRelationVo;
@@ -13,10 +13,9 @@ import com.jcfx.mall.product.vo.AttrGroupWithAttrsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.jcfx.mall.product.entity.AttrGroupEntity;
-import com.jcfx.mall.product.service.AttrGroupService;
-import com.jcfx.common.utils.PageUtils;
-import com.jcfx.common.utils.R;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -42,8 +41,7 @@ public class AttrGroupController {
      * 列表
      */
     @RequestMapping("/list/{catlogId}")
-    public R list(@RequestParam Map<String, Object> params,
-                  @PathVariable Long catlogId) {
+    public R list(@RequestParam Map<String, Object> params, @PathVariable Long catlogId) {
         PageUtils page = attrGroupService.queryPage(params, catlogId);
 
         return R.ok().put("page", page);

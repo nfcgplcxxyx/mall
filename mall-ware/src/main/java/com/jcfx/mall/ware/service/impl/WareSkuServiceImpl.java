@@ -1,23 +1,23 @@
 package com.jcfx.mall.ware.service.impl;
 
-import com.jcfx.common.utils.R;
-import com.jcfx.mall.ware.feign.ProductFeignService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jcfx.common.to.SkuStockVO;
 import com.jcfx.common.utils.PageUtils;
 import com.jcfx.common.utils.Query;
-
+import com.jcfx.common.utils.R;
 import com.jcfx.mall.ware.dao.WareSkuDao;
 import com.jcfx.mall.ware.entity.WareSkuEntity;
+import com.jcfx.mall.ware.feign.ProductFeignService;
 import com.jcfx.mall.ware.service.WareSkuService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service("wareSkuService")
@@ -76,6 +76,20 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         } else {
             wareSkuDao.addStock(skuId, wareId, skuNum);
         }
+    }
+
+    @Override
+    public List<SkuStockVO> hasStock(List<Long> skuIds) {
+        List<SkuStockVO> list;
+        list = skuIds.stream().map(skuId -> {
+            SkuStockVO stockVO = new SkuStockVO();
+            Long count = baseMapper.getSkuStock(skuId);
+            stockVO.setSkuId(skuId);
+            stockVO.setHasStock(count > 0);
+            return stockVO;
+        }).collect(Collectors.toList());
+
+        return list;
     }
 
 }

@@ -1,7 +1,7 @@
 package com.jcfx.mall.product.dao;
 
-import com.jcfx.mall.product.entity.CategoryBrandRelationEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jcfx.mall.product.entity.CategoryBrandRelationEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

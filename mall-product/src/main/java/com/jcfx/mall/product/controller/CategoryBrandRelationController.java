@@ -1,21 +1,19 @@
 package com.jcfx.mall.product.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jcfx.common.utils.PageUtils;
+import com.jcfx.common.utils.R;
+import com.jcfx.mall.product.entity.BrandEntity;
+import com.jcfx.mall.product.entity.CategoryBrandRelationEntity;
+import com.jcfx.mall.product.service.CategoryBrandRelationService;
+import com.jcfx.mall.product.vo.BrandVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.jcfx.mall.product.entity.BrandEntity;
-import com.jcfx.mall.product.vo.BrandVo;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import com.jcfx.mall.product.entity.CategoryBrandRelationEntity;
-import com.jcfx.mall.product.service.CategoryBrandRelationService;
-import com.jcfx.common.utils.PageUtils;
-import com.jcfx.common.utils.R;
 
 
 /**
@@ -44,7 +42,7 @@ public class CategoryBrandRelationController {
     /**
      * 当前品牌关联的所有分类列表
      *
-     * @param brandId
+     * @param brandId 品牌id
      * @return
      */
     @GetMapping("/catelog/list")

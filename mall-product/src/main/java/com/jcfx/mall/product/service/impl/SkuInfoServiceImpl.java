@@ -1,20 +1,21 @@
 package com.jcfx.mall.product.service.impl;
 
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.Map;
-
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jcfx.common.utils.PageUtils;
 import com.jcfx.common.utils.Query;
-
 import com.jcfx.mall.product.dao.SkuInfoDao;
 import com.jcfx.mall.product.entity.SkuInfoEntity;
 import com.jcfx.mall.product.service.SkuInfoService;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 @Service("skuInfoService")
@@ -82,6 +83,15 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         IPage<SkuInfoEntity> page = this.page(new Query<SkuInfoEntity>().getPage(params), queryWrapper);
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<SkuInfoEntity> getAllSkuBySpuId(Long spuId) {
+        List<SkuInfoEntity> list = new ArrayList<>();
+        LambdaQueryWrapper<SkuInfoEntity> wrapper = new QueryWrapper<SkuInfoEntity>().lambda();
+        wrapper.eq(SkuInfoEntity::getSpuId, spuId);
+        list = this.list(wrapper);
+        return list;
     }
 
 }

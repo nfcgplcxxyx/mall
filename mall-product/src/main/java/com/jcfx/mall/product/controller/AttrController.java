@@ -1,20 +1,18 @@
 package com.jcfx.mall.product.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import com.jcfx.common.utils.PageUtils;
+import com.jcfx.common.utils.R;
 import com.jcfx.mall.product.entity.ProductAttrValueEntity;
+import com.jcfx.mall.product.service.AttrService;
 import com.jcfx.mall.product.service.ProductAttrValueService;
 import com.jcfx.mall.product.vo.AttrRespVo;
 import com.jcfx.mall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.jcfx.mall.product.entity.AttrEntity;
-import com.jcfx.mall.product.service.AttrService;
-import com.jcfx.common.utils.PageUtils;
-import com.jcfx.common.utils.R;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 
 /**

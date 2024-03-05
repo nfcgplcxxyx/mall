@@ -1,7 +1,5 @@
 package com.jcfx.common.constant;
 
-import lombok.Data;
-
 public class ProductConstant {
 
 

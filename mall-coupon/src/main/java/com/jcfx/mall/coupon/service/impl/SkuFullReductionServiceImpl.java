@@ -1,10 +1,18 @@
 package com.jcfx.mall.coupon.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jcfx.common.to.MemberPrice;
 import com.jcfx.common.to.SkuReductionTo;
+import com.jcfx.common.utils.PageUtils;
+import com.jcfx.common.utils.Query;
+import com.jcfx.mall.coupon.dao.SkuFullReductionDao;
 import com.jcfx.mall.coupon.entity.MemberPriceEntity;
+import com.jcfx.mall.coupon.entity.SkuFullReductionEntity;
 import com.jcfx.mall.coupon.entity.SkuLadderEntity;
 import com.jcfx.mall.coupon.service.MemberPriceService;
+import com.jcfx.mall.coupon.service.SkuFullReductionService;
 import com.jcfx.mall.coupon.service.SkuLadderService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +22,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jcfx.common.utils.PageUtils;
-import com.jcfx.common.utils.Query;
-
-import com.jcfx.mall.coupon.dao.SkuFullReductionDao;
-import com.jcfx.mall.coupon.entity.SkuFullReductionEntity;
-import com.jcfx.mall.coupon.service.SkuFullReductionService;
-
-import javax.xml.ws.Action;
 
 
 @Service("skuFullReductionService")

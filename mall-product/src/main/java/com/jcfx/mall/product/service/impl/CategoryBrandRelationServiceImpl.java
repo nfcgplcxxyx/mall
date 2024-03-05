@@ -1,27 +1,25 @@
 package com.jcfx.mall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jcfx.common.utils.PageUtils;
+import com.jcfx.common.utils.Query;
 import com.jcfx.mall.product.dao.BrandDao;
+import com.jcfx.mall.product.dao.CategoryBrandRelationDao;
 import com.jcfx.mall.product.dao.CategoryDao;
 import com.jcfx.mall.product.entity.BrandEntity;
+import com.jcfx.mall.product.entity.CategoryBrandRelationEntity;
 import com.jcfx.mall.product.entity.CategoryEntity;
 import com.jcfx.mall.product.service.BrandService;
+import com.jcfx.mall.product.service.CategoryBrandRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jcfx.common.utils.PageUtils;
-import com.jcfx.common.utils.Query;
-
-import com.jcfx.mall.product.dao.CategoryBrandRelationDao;
-import com.jcfx.mall.product.entity.CategoryBrandRelationEntity;
-import com.jcfx.mall.product.service.CategoryBrandRelationService;
 
 
 @Service("categoryBrandRelationService")

@@ -1,19 +1,18 @@
 package com.jcfx.mall.ware.controller;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import com.jcfx.common.utils.PageUtils;
+import com.jcfx.common.utils.R;
+import com.jcfx.mall.ware.entity.PurchaseEntity;
+import com.jcfx.mall.ware.service.PurchaseService;
 import com.jcfx.mall.ware.vo.MergeVo;
 import com.jcfx.mall.ware.vo.PurchaseDoneVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.jcfx.mall.ware.entity.PurchaseEntity;
-import com.jcfx.mall.ware.service.PurchaseService;
-import com.jcfx.common.utils.PageUtils;
-import com.jcfx.common.utils.R;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 /**

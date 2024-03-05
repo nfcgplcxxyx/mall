@@ -1,20 +1,15 @@
 package com.jcfx.mall.product.controller;
 
+import com.jcfx.common.utils.PageUtils;
+import com.jcfx.common.utils.R;
+import com.jcfx.mall.product.entity.CategoryEntity;
+import com.jcfx.mall.product.service.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.jcfx.mall.product.entity.CategoryEntity;
-import com.jcfx.mall.product.service.CategoryService;
-import com.jcfx.common.utils.PageUtils;
-import com.jcfx.common.utils.R;
 
 
 /**
@@ -79,7 +74,7 @@ public class CategoryController {
     }
 
     /**
-     * 用于批量修改
+     * 批量修改
      */
     @RequestMapping("/update/sort")
     public R updateSort(@RequestBody CategoryEntity[] category) {

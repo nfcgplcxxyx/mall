@@ -1,16 +1,16 @@
 package com.jcfx.mall.product.service.impl;
 
-import org.springframework.stereotype.Service;
-import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jcfx.common.utils.PageUtils;
 import com.jcfx.common.utils.Query;
-
 import com.jcfx.mall.product.dao.SkuSaleAttrValueDao;
 import com.jcfx.mall.product.entity.SkuSaleAttrValueEntity;
 import com.jcfx.mall.product.service.SkuSaleAttrValueService;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 
 @Service("skuSaleAttrValueService")

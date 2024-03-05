@@ -1,31 +1,35 @@
 package com.jcfx.mall.product.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jcfx.common.to.SkuReductionTo;
+import com.jcfx.common.to.SkuStockVO;
 import com.jcfx.common.to.SpuBoundTo;
+import com.jcfx.common.to.es.SkuESModel;
+import com.jcfx.common.utils.PageUtils;
+import com.jcfx.common.utils.Query;
 import com.jcfx.common.utils.R;
+import com.jcfx.mall.product.dao.SpuInfoDao;
 import com.jcfx.mall.product.entity.*;
 import com.jcfx.mall.product.feign.CouponFeignService;
+import com.jcfx.mall.product.feign.ElasticFeignService;
+import com.jcfx.mall.product.feign.WareFeignService;
 import com.jcfx.mall.product.service.*;
 import com.jcfx.mall.product.vo.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jcfx.common.utils.PageUtils;
-import com.jcfx.common.utils.Query;
-
-import com.jcfx.mall.product.dao.SpuInfoDao;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 
 @Service("spuInfoService")
@@ -47,6 +51,14 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private SkuSaleAttrValueService skuSaleAttrValueService;
     @Autowired
     private CouponFeignService couponFeignService;
+    @Autowired
+    private BrandService brandService;
+    @Autowired
+    private CategoryService categoryService;
+    @Autowired
+    private WareFeignService wareFeignService;
+    @Autowired
+    private ElasticFeignService elasticFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -197,6 +209,67 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         return new PageUtils(page);
 
+    }
+
+    @Override
+    public void up(Long spuId) {
+        List<SkuESModel> products;
+
+        // 1.查询spuId下的所有sku信息
+        List<SkuInfoEntity> skuList = skuInfoService.getAllSkuBySpuId(spuId);
+        List<Long> skuIdList = skuList.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
+        // 2.查询sku所有可被用于检索的属性
+        List<ProductAttrValueEntity> attrsBySpuId = attrValueService.baseAttrlistforspu(spuId);
+        List<Long> attrIds = attrsBySpuId.stream().map(attr -> attr.getId()).collect(Collectors.toList());
+        List<Long> searcheableAttrIds = attrService.getSearcheableAttrs(attrIds).stream().map(attr -> attr.getAttrId()).collect(Collectors.toList());
+        HashSet<Long> idSet = new HashSet<>(searcheableAttrIds);
+        List<SkuESModel.Attrs> attrsList = attrsBySpuId.stream().filter(item -> idSet.contains(item.getAttrId())).map(attrEntity -> {
+            SkuESModel.Attrs attrs = new SkuESModel.Attrs();
+            attrs.setAttrId(attrEntity.getAttrId());
+            attrs.setAttrName(attrEntity.getAttrName());
+            attrs.setAttrValue(attrEntity.getAttrValue());
+            return attrs;
+        }).collect(Collectors.toList());
+
+        Map<Long, Boolean> booleanMap = null;
+        try {
+            R hasStockR = wareFeignService.hasStock(skuIdList);
+            TypeReference<List<SkuStockVO>> typeReference = new TypeReference<List<SkuStockVO>>() {
+            };
+            booleanMap = hasStockR.getData(typeReference).stream().collect(Collectors.toMap(SkuStockVO::getSkuId, SkuStockVO::getHasStock));
+        } catch (Exception e) {
+            log.error("库存服务查询异常，原因{}", e);
+        }
+
+        Map<Long, Boolean> finalBooleanMap = booleanMap;
+        products = skuList.stream().map(sku -> {
+            SkuESModel esModel = new SkuESModel();
+            BeanUtils.copyProperties(sku, esModel);
+            esModel.setSkuPrice(sku.getPrice());
+            esModel.setSkuImg(sku.getSkuDefaultImg());
+            if (finalBooleanMap == null) {
+                esModel.setHasStock(true);
+            } else {
+                esModel.setHasStock(finalBooleanMap.get(sku.getSkuId()));
+            }
+            esModel.setHotScore(0L);
+            BrandEntity brand = brandService.getById(sku.getBrandId());
+            esModel.setBrandName(brand.getName());
+            esModel.setBrandImg(brand.getLogo());
+            CategoryEntity category = categoryService.getById(sku.getCatalogId());
+            esModel.setCatalogName(category.getName());
+            esModel.setAttrs(attrsList);
+
+            return esModel;
+        }).collect(Collectors.toList());
+
+        R up = elasticFeignService.up(products);
+        if (up.getCode() == 0) {
+            //TODO 上架成功，修改spu的状态
+
+        } else {
+
+        }
     }
 
 }
