@@ -77,6 +77,15 @@ public class WareSkuController {
         return R.ok();
     }
 
+    /**
+     * @param skuIds 要查询的skuId劣币
+     * @return list
+     * @throws
+     * @title: hasStock
+     * @description: <p>查询sku是否有库存</p>
+     * @author: NFFive
+     * @date: 2024/6/5 23:18
+     */
     @PostMapping("/hasStock")
     public R hasStock(@RequestBody List<Long> skuIds) {
         List<SkuStockVO> list = wareSkuService.hasStock(skuIds);

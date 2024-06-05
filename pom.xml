@@ -7,7 +7,6 @@
     <artifactId>mall</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>mall</name>
-    <description>fu gong cheng</description>
     <packaging>pom</packaging>
 
     <modules>

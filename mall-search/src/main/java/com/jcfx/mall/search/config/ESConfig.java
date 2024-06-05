@@ -19,7 +19,6 @@ public class ESConfig {
 
     @Bean
     public RestHighLevelClient getESClient() {
-        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.3.211", 9200, "http")));
-        return client;
+        return new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.0.104", 9200, "http")));
     }
 }

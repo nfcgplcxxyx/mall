@@ -2,8 +2,10 @@ package com.jcfx.mall.product.service.impl;
 
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jcfx.common.constant.ProductConstant;
 import com.jcfx.common.to.SkuReductionTo;
 import com.jcfx.common.to.SkuStockVO;
 import com.jcfx.common.to.SpuBoundTo;
@@ -22,6 +24,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -70,6 +73,11 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         return new PageUtils(page);
     }
 
+    /**
+     * 后台新增商品
+     *
+     * @param vo 商品实体
+     */
     @Transactional
     @Override
     public void saveSpuInfo(SpuSaveVo vo) {
@@ -120,7 +128,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         // 5.保存spu对应的sku信息
         List<Skus> skus = vo.getSkus();
-        if (skus != null && skus.size() > 0) {
+        if (!CollectionUtils.isEmpty(skus)) {
             // 5.1 sku基本信息
             skus.forEach(item -> {
                 String defaultImg = "";
@@ -211,18 +219,32 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     }
 
+    /**
+     * @param spuId spuid
+     * @return R
+     * @title: up
+     * @description: <p>商品上架</p>
+     * @author: NFFive
+     * @date: 2024/6/5 22:57
+     */
     @Override
     public void up(Long spuId) {
+        // 待上架的商品
         List<SkuESModel> products;
 
         // 1.查询spuId下的所有sku信息
         List<SkuInfoEntity> skuList = skuInfoService.getAllSkuBySpuId(spuId);
+
+        // 收集skuId为List
         List<Long> skuIdList = skuList.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
-        // 2.查询sku所有可被用于检索的属性
+
+        // 2.查询所有可被用于检索的属性，attr表中search_type为1的
+        // 2.1根据spuId查询所有属性并收集为List
         List<ProductAttrValueEntity> attrsBySpuId = attrValueService.baseAttrlistforspu(spuId);
-        List<Long> attrIds = attrsBySpuId.stream().map(attr -> attr.getId()).collect(Collectors.toList());
-        List<Long> searcheableAttrIds = attrService.getSearcheableAttrs(attrIds).stream().map(attr -> attr.getAttrId()).collect(Collectors.toList());
-        HashSet<Long> idSet = new HashSet<>(searcheableAttrIds);
+        List<Long> attrIds = attrsBySpuId.stream().map(ProductAttrValueEntity::getId).collect(Collectors.toList());
+        // 2.2过滤出可以被检索的属性
+        HashSet<Long> idSet = attrService.getSearcheableAttrs(attrIds).stream().map(AttrEntity::getAttrId).collect(Collectors.toCollection(HashSet::new));
+        // 2.3组装
         List<SkuESModel.Attrs> attrsList = attrsBySpuId.stream().filter(item -> idSet.contains(item.getAttrId())).map(attrEntity -> {
             SkuESModel.Attrs attrs = new SkuESModel.Attrs();
             attrs.setAttrId(attrEntity.getAttrId());
@@ -231,31 +253,42 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             return attrs;
         }).collect(Collectors.toList());
 
+        // 3.查询sku的库存情况
         Map<Long, Boolean> booleanMap = null;
         try {
+            // 一次性的查询各个sku是否有库存
             R hasStockR = wareFeignService.hasStock(skuIdList);
             TypeReference<List<SkuStockVO>> typeReference = new TypeReference<List<SkuStockVO>>() {
             };
+            // 收集为map，key是skuId，value是它是否有库存的boolean
             booleanMap = hasStockR.getData(typeReference).stream().collect(Collectors.toMap(SkuStockVO::getSkuId, SkuStockVO::getHasStock));
         } catch (Exception e) {
-            log.error("库存服务查询异常，原因{}", e);
+            log.error("库存服务查询异常，原因：{}", e);
         }
 
         Map<Long, Boolean> finalBooleanMap = booleanMap;
+
+        // 3.组装
         products = skuList.stream().map(sku -> {
             SkuESModel esModel = new SkuESModel();
+
             BeanUtils.copyProperties(sku, esModel);
             esModel.setSkuPrice(sku.getPrice());
             esModel.setSkuImg(sku.getSkuDefaultImg());
+
             if (finalBooleanMap == null) {
                 esModel.setHasStock(true);
             } else {
                 esModel.setHasStock(finalBooleanMap.get(sku.getSkuId()));
             }
+
+            // 刚上架的商品热度评分默认给个0
             esModel.setHotScore(0L);
+
             BrandEntity brand = brandService.getById(sku.getBrandId());
             esModel.setBrandName(brand.getName());
             esModel.setBrandImg(brand.getLogo());
+
             CategoryEntity category = categoryService.getById(sku.getCatalogId());
             esModel.setCatalogName(category.getName());
             esModel.setAttrs(attrsList);
@@ -265,10 +298,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         R up = elasticFeignService.up(products);
         if (up.getCode() == 0) {
-            //TODO 上架成功，修改spu的状态
-
+            // 上架成功，修改spu的状态
+            this.update(new UpdateWrapper<SpuInfoEntity>().lambda()
+                    .set(SpuInfoEntity::getPublishStatus, ProductConstant.StatusEnum.SPU_UP.getCode())
+                    .eq(SpuInfoEntity::getId, spuId));
         } else {
-
+            // TODO 重试机制
         }
     }
 

@@ -21,13 +21,21 @@ public class ESSaveController {
     @Autowired
     private ESSaveService saveService;
 
+    /**
+     * @param list 商品列表
+     * @return R
+     * @title: up
+     * @description: <p>上架商品，存入ElasticSearch中</p>
+     * @author: NFFive
+     * @date: 2024/6/5 22:27
+     */
     @PostMapping("/product")
     public R up(@RequestBody List<SkuESModel> list) {
         try {
             saveService.up(list);
             return R.ok();
         } catch (Exception e) {
-            log.error("商品上架错误：{}", e);
+            log.error("商品上架错误：{}", e.getMessage());
             return R.error(BizCodeEnum.PRODUCT_UP_EXCEPTION.getCode(), BizCodeEnum.PRODUCT_UP_EXCEPTION.getMsg());
         }
 
