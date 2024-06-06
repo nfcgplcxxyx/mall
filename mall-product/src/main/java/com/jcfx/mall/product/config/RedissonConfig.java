@@ -12,7 +12,7 @@ import java.io.IOException;
 public class RedissonConfig {
 
     @Bean(destroyMethod = "shutdown")
-    public RedissonClient redisson() throws IOException {
+    public RedissonClient redisson() {
         Config config = new Config();
         config.useSingleServer().setAddress("redis://127.0.0.1:6379");
         return Redisson.create(config);

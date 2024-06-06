@@ -4,6 +4,7 @@ import com.jcfx.mall.product.service.BrandService;
 import com.jcfx.mall.product.service.CategoryService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -20,9 +21,11 @@ public class MallProductApplicationTests {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    @Autowired
+    private RedissonClient redissonClient;
+
     @Test
     public void contextLoads() {
-
     }
 
 }

@@ -5,6 +5,7 @@ import com.jcfx.common.utils.R;
 import com.jcfx.mall.product.entity.CategoryEntity;
 import com.jcfx.mall.product.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -30,6 +31,12 @@ public class CategoryController {
         List<CategoryEntity> entityList = categoryService.treeList();
 
         return R.ok().put("tree", entityList);
+    }
+
+    @GetMapping(value = "/levelOneList")
+    public R levelOneList() {
+        List<CategoryEntity> list = categoryService.levelOneList();
+        return R.ok().put("list", list);
     }
 
     /**

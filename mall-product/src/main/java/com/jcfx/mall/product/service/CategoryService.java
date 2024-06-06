@@ -18,6 +18,13 @@ public interface CategoryService extends IService<CategoryEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 
+    /**
+     * @return list 树形列表
+     * @title: treeList
+     * @description: <p>商品分类的树形列表</p>
+     * @author: NFFive
+     * @date: 2024/6/6 12:47
+     */
     List<CategoryEntity> treeList();
 
     void removeCatByIds(List<Long> asList);
@@ -25,5 +32,8 @@ public interface CategoryService extends IService<CategoryEntity> {
     Long[] getCatlogPath(Long catelogId);
 
     void updateCascade(CategoryEntity category);
+
+    List<CategoryEntity> levelOneList();
+
 }
 
